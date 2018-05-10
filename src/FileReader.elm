@@ -52,8 +52,7 @@ together with a set of examples.
 
 @docs onFileChange
 
-
-# Helpers: Conversors
+#Helpers: Conversors
 
 @docs mimeToString
 
@@ -216,7 +215,12 @@ parseDroppedFiles =
 -}
 mimeToString : NativeFile -> String
 mimeToString nf =
-    MimeType.toString nf
+    case nf.mimeType of
+        Nothing ->
+            ""
+
+        Just mime ->
+            MimeType.toString mime
 
 
 
