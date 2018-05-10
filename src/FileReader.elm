@@ -1,19 +1,20 @@
 module FileReader
     exposing
-        ( FileRef
+        ( Error(..)
         , FileContentArrayBuffer
         , FileContentDataUrl
+        , FileRef
         , NativeFile
-        , Error(..)
+        , filePart
+        , mimeToString
         , onFileChange
-        , readAsTextFile
+        , parseDroppedFiles
+        , parseSelectedFiles
+        , prettyPrint
+        , rawBody
         , readAsArrayBuffer
         , readAsDataUrl
-        , prettyPrint
-        , parseSelectedFiles
-        , parseDroppedFiles
-        , filePart
-        , rawBody
+        , readAsTextFile
         )
 
 {-| Elm bindings for the main [HTML5 FileReader APIs](https://developer.mozilla.org/en/docs/Web/API/FileReader):
@@ -51,15 +52,20 @@ together with a set of examples.
 
 @docs onFileChange
 
+
+# Helpers: Conversors
+
+@docs mimeToString
+
 -}
 
 import Html exposing (Attribute)
 import Html.Events exposing (on)
-import Native.FileReader
-import Http exposing (Part, Body)
-import Task exposing (Task, fail)
+import Http exposing (Body, Part)
 import Json.Decode as Json exposing (Decoder, Value)
 import MimeType
+import Native.FileReader
+import Task exposing (Task, fail)
 
 
 {-| Helper type for interpreting the Files event value from Input and drag 'n drop.
@@ -206,6 +212,13 @@ parseDroppedFiles =
     fileParser "dataTransfer"
 
 
+{-| Returns a string with the mime type of the given file.
+-}
+mimeToString : NativeFile -> String
+mimeToString nf =
+    MimeType.toString nf
+
+
 
 -- UN-EXPORTED HELPERS
 
@@ -253,9 +266,9 @@ fileListDecoder decoder =
                 |> List.map (\index -> Json.field (toString index) decoder)
                 |> List.foldr (Json.map2 (::)) (Json.succeed [])
     in
-        Json.field "length" Json.int
-            |> Json.map (\i -> List.range 0 (i - 1))
-            |> Json.andThen decodeFileValues
+    Json.field "length" Json.int
+        |> Json.map (\i -> List.range 0 (i - 1))
+        |> Json.andThen decodeFileValues
 
 
 {-| mime type: parsed as string and then converted to a MimeType
