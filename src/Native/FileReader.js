@@ -1,7 +1,7 @@
 // To use the examples, swap the commenting on the next two lines
 
-// var _user$project$Native_FileReader = function() {
-var _simonh1000$file_reader$Native_FileReader = function() {
+var _chiptunes$file_reader$Native_FileReader = function() {
+//var _simonh1000$file_reader$Native_FileReader = function() {
 
     var scheduler = _elm_lang$core$Native_Scheduler;
 
